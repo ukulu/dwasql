@@ -50,4 +50,19 @@ CREATE TABLE `session_event_paths` (
 );
 
 # now we are able to select the journeys we want to have
+REPLACE INTO `screen_flows`(
+	SELECT ses.session_id, MIN(ses.event_time) AS `at`,
+		SUBSTRING_INDEX(GROUP_CONCAT(ses.event_name), ',', 1) AS name_1, 
+		SUBSTRING_INDEX(GROUP_CONCAT(ses.event_duration), ',', 1) AS duration_1, 
+		SUBSTRING_INDEX(GROUP_CONCAT(ses.event_count), ',', 1) AS event_count_1,
+		REPLACE(SUBSTRING_INDEX(GROUP_CONCAT(ses.event_name), ',', 2), CONCAT(SUBSTRING_INDEX(GROUP_CONCAT(ses.event_name), ',', 1), ","), "") AS name_2, 
+		REPLACE(SUBSTRING_INDEX(GROUP_CONCAT(ses.event_duration), ',', 2), CONCAT(SUBSTRING_INDEX(GROUP_CONCAT(ses.event_duration), ',', 1), ","), "") AS duration_2, 
+		REPLACE(SUBSTRING_INDEX(GROUP_CONCAT(ses.event_count), ',', 2), CONCAT(SUBSTRING_INDEX(GROUP_CONCAT(ses.event_count), ',', 1), ","), "") AS event_count_2,
+		REPLACE(SUBSTRING_INDEX(GROUP_CONCAT(ses.event_name), ',', 3), CONCAT(SUBSTRING_INDEX(GROUP_CONCAT(ses.event_name), ',', 2), ","), "") AS name_3, 
+		REPLACE(SUBSTRING_INDEX(GROUP_CONCAT(ses.event_duration), ',', 3), CONCAT(SUBSTRING_INDEX(GROUP_CONCAT(ses.event_duration), ',', 2), ","), "") AS duration_3,
+		REPLACE(SUBSTRING_INDEX(GROUP_CONCAT(ses.event_count), ',', 3), CONCAT(SUBSTRING_INDEX(GROUP_CONCAT(ses.event_count), ',', 2), ","), "") AS event_count_3
+	FROM session_events_sequences ses
+	GROUP BY ses.user_id, ses.session_id
+)
 
+# it is done, the reults have been updated in the requested destination entity
